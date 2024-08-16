@@ -5,6 +5,7 @@ import pyautogui
 import psutil
 import pandas as pd
 import webbrowser
+import datetime
 
 
 def close_zoom():
@@ -51,11 +52,12 @@ days_map = {
 
 df = pd.read_excel('meetings.xlsx', dtype={'day': str, 'time': str, 'meeting_id': str, 'passcode': str, 'type': str})
 
+today = datetime.datetime.now().strftime('%A').lower()
+
 for _, row in df.iterrows():
-    for day in row['day'].lower().split(','):
-        day = day.strip()
-        if day in days_map:
-            days_map[day].at(row['time']).do(join_meeting, row['type'], row['meeting_id'], row.get('passcode'))
+    day = row['day'].strip().lower()
+    if day == today:
+        schedule.every().day.at(row['time']).do(join_meeting, row['type'], row['meeting_id'], row.get('passcode'))
 
 while True:
     schedule.run_pending()
