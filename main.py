@@ -8,7 +8,7 @@ import webbrowser
 
 
 def close_zoom():
-    for proc in psutil.process_iter(['pid', 'name']):
+    for proc in psutil.process_iter(['name']):
         if proc.info['name'] == 'Zoom.exe':
             proc.kill()
 
@@ -37,14 +37,25 @@ def join_meeting(meeting_type, meeting_id, passcode=None):
         join_zoom_meeting(meeting_id, passcode)
     elif meeting_type == 'google_meet':
         join_google_meet(meeting_id)
-    else:
-        print(f"Unknown meeting type: {meeting_type}")
 
 
-df = pd.read_excel('meetings.xlsx', dtype={'time': str, 'meeting_id': str, 'passcode': str, 'type': str})
+days_map = {
+    'monday': schedule.every().monday,
+    'tuesday': schedule.every().tuesday,
+    'wednesday': schedule.every().wednesday,
+    'thursday': schedule.every().thursday,
+    'friday': schedule.every().friday,
+    'saturday': schedule.every().saturday,
+    'sunday': schedule.every().sunday
+}
+
+df = pd.read_excel('meetings.xlsx', dtype={'day': str, 'time': str, 'meeting_id': str, 'passcode': str, 'type': str})
 
 for _, row in df.iterrows():
-    schedule.every().day.at(row['time']).do(join_meeting, row['type'], row['meeting_id'], row.get('passcode'))
+    for day in row['day'].lower().split(','):
+        day = day.strip()
+        if day in days_map:
+            days_map[day].at(row['time']).do(join_meeting, row['type'], row['meeting_id'], row.get('passcode'))
 
 while True:
     schedule.run_pending()
