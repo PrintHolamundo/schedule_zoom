@@ -19,7 +19,7 @@ def join_zoom_meeting(meeting_id, passcode):
     time.sleep(2)
     subprocess.Popen(['C:\\Users\\davidharo\\AppData\\Roaming\\Zoom\\bin\\Zoom.exe'])
     time.sleep(10)
-    pyautogui.press('tab', presses=11, interval=0.1)
+    pyautogui.press('tab', presses=12, interval=0.1)
     pyautogui.press('enter')
     time.sleep(2)
     pyautogui.write(str(meeting_id))
